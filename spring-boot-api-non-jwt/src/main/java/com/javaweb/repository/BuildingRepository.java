@@ -1,12 +1,12 @@
 package com.javaweb.repository;
 
 import java.util.List;
+import java.util.Map;
 
-import com.javaweb.DTO.BuildingDetailsDTO;
-import com.javaweb.criteria.BuildingCriteria;
+import com.javaweb.repository.entity.BuildingEntity;
 
 public interface BuildingRepository {
-	List<BuildingDetailsDTO> findAll(BuildingCriteria buildingCriteria);
+	List<BuildingEntity> findAll(Map<String, String> params);
 	void delete(Long[] ids);
 	void create();
 }

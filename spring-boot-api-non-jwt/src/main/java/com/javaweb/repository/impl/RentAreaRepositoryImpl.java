@@ -16,7 +16,7 @@ import com.javaweb.utils.ConnectionUtil;
 public class RentAreaRepositoryImpl implements RentAreaRepository {
 
 	@Override
-	public List<Long> getRentAreaById(Long buildingId) {
+	public List<Long> getRentAreaByBuildingId(Long buildingId) {
 		String sql = "SELECT rentarea.value FROM rentarea "
 				+ "INNER JOIN building ON building.id = rentarea.buildingid "
 				+ "WHERE buildingid = " + buildingId;

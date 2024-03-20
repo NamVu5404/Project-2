@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.javaweb.DTO.BuildingDTO;
-import com.javaweb.criteria.BuildingCriteria;
 import com.javaweb.service.BuildingService;
 
 @RestController
@@ -24,58 +23,7 @@ public class BuildingAPI {
 
 	@GetMapping
 	public List<BuildingDTO> findBuilding(@RequestParam Map<String, String> params) {
-		BuildingCriteria buildingCriteria = new BuildingCriteria();
-		
-		if (params.containsKey("name")) {
-			buildingCriteria.setName(params.get("name"));
-		}
-		if (params.containsKey("floorArea") && params.get("floorArea") != null) {
-			buildingCriteria.setFloorArea(Long.valueOf(params.get("floorArea")) );
-		}
-		if (params.containsKey("ward")) {
-			buildingCriteria.setWard(params.get("ward"));
-		}
-		if (params.containsKey("street")) {
-			buildingCriteria.setStreet(params.get("street"));
-		}
-		if (params.containsKey("districtId") && params.get("districtId") != null) {
-			buildingCriteria.setDistrictId(Long.valueOf(params.get("districtId")));
-		}
-		if (params.containsKey("numberOfBasement") && params.get("numberOfBasement") != null) {
-			buildingCriteria.setNumberOfBasement(Long.valueOf(params.get("numberOfBasement")));
-		}
-		if (params.containsKey("managerName")) {
-			buildingCriteria.setManagerName(params.get("managerName"));
-		}
-		if (params.containsKey("managerPhoneNumber")) {
-			buildingCriteria.setManagerPhoneNumber(params.get("managerPhoneNumber"));
-		}
-		if (params.containsKey("direction")) {
-			buildingCriteria.setDirection(params.get("direction"));
-		}
-		if (params.containsKey("level")) {
-			buildingCriteria.setLevel(params.get("level"));
-		}
-		if (params.containsKey("areaFrom") && params.get("areaFrom") != null) {
-			buildingCriteria.setAreaFrom(Long.valueOf(params.get("areaFrom")));
-		}
-		if (params.containsKey("areaTo") && params.get("areaTo") != null) {
-			buildingCriteria.setAreaTo(Long.valueOf(params.get("areaTo")));
-		}
-		if (params.containsKey("rentPriceFrom") && params.get("rentPriceFrom") != null) {
-			buildingCriteria.setRentPriceFrom(Long.valueOf(params.get("rentPriceFrom")));
-		}
-		if (params.containsKey("rentPriceTo") && params.get("rentPriceTo") != null) {
-			buildingCriteria.setRentPriceTo(Long.valueOf(params.get("rentPriceTo")));
-		}
-		if (params.containsKey("staffId") && params.get("staffId") != null) {
-			buildingCriteria.setStaffId(Long.valueOf(params.get("staffId")));
-		}
-		if (params.containsKey("typeCode")) {
-	        buildingCriteria.setTypeCode(params.get("typeCode").split(","));
-	    }
-		
-		List<BuildingDTO> result = buildingService.findAll(buildingCriteria);
+		List<BuildingDTO> result = buildingService.findAll(params);
 		return result;
 	}
 

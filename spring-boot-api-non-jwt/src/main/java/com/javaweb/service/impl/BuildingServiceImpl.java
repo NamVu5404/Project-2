@@ -2,14 +2,16 @@ package com.javaweb.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.javaweb.DTO.BuildingDTO;
-import com.javaweb.DTO.BuildingDetailsDTO;
-import com.javaweb.criteria.BuildingCriteria;
 import com.javaweb.repository.BuildingRepository;
+import com.javaweb.repository.DistrictRepository;
+import com.javaweb.repository.RentAreaRepository;
+import com.javaweb.repository.entity.BuildingEntity;
 import com.javaweb.service.BuildingService;
 
 @Service
@@ -18,14 +20,23 @@ public class BuildingServiceImpl implements BuildingService {
 	@Autowired
 	private BuildingRepository buildingRepository;
 	
+	@Autowired
+	private DistrictRepository districtRepository;
+	
+	@Autowired
+	private RentAreaRepository rentAreaRepository;
+	
 	@Override
-	public List<BuildingDTO> findAll(BuildingCriteria buildingCriteria) {
-		List<BuildingDetailsDTO> buildingDetailsDTOs = buildingRepository.findAll(buildingCriteria);
+	public List<BuildingDTO> findAll(Map<String, String> params) {
+		List<BuildingEntity> buildingEntities = buildingRepository.findAll(params);
 		List<BuildingDTO> result = new ArrayList<BuildingDTO>();
-		for (BuildingDetailsDTO item : buildingDetailsDTOs) {
+		
+		for (BuildingEntity item : buildingEntities) {
+			String districtName = districtRepository.getDistrictNameByBuildingId(item.getId());
+			List<Long> rentAreas = rentAreaRepository.getRentAreaByBuildingId(item.getId());
 			BuildingDTO building = new BuildingDTO();
 			building.setName(item.getName());
-			building.setAdress(item.getStreet() + ", " + item.getWard() + ", " + item.getDistrictName());
+			building.setAdress(item.getStreet() + ", " + item.getWard() + ", " + districtName);
 			building.setNumberOfBasement(item.getNumberOfBasement());
 			building.setManagerName(item.getManagerName());
 			building.setManagerPhoneNumber(item.getManagerPhoneNumber());
@@ -34,13 +45,14 @@ public class BuildingServiceImpl implements BuildingService {
 			building.setBrokerageFee(item.getBrokerageFee());
 			building.setServiceFee(item.getServiceFee());
 			String rentArea = "";
-			for (Long value : item.getRentArea()) {
+			for (Long value : rentAreas) {
 				rentArea += String.valueOf(value) + ", ";
 			}
 			rentArea = rentArea.substring(0, rentArea.length() - 2);
 			building.setRentArea(rentArea);
 			result.add(building);
 		}
+		
 		return result;
 	}
 	

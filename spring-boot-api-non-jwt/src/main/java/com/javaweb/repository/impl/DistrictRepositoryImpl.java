@@ -14,7 +14,7 @@ import com.javaweb.utils.ConnectionUtil;
 public class DistrictRepositoryImpl implements DistrictRepository {
 
 	@Override
-	public String getDistrictNameById(Long buildingId) {
+	public String getDistrictNameByBuildingId(Long buildingId) {
 		String sql = "SELECT district.name FROM district "
 				+ "INNER JOIN building on building.districtid = district.id "
 				+ "WHERE building.id = " + buildingId;

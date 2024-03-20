@@ -6,103 +6,96 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.javaweb.DTO.BuildingDetailsDTO;
-import com.javaweb.criteria.BuildingCriteria;
 import com.javaweb.repository.BuildingRepository;
-import com.javaweb.repository.DistrictRepository;
-import com.javaweb.repository.RentAreaRepository;
+import com.javaweb.repository.entity.BuildingEntity;
 import com.javaweb.utils.ConnectionUtil;
 
 @Repository
 public class BuildingRepositoryImpl implements BuildingRepository {
 
-	@Autowired
-	private DistrictRepository districtRepository;
-	
-	@Autowired
-	private RentAreaRepository rentAreaRepository;
-	
 	@Override
-	public List<BuildingDetailsDTO> findAll(BuildingCriteria buildingCriteria) {
+	public List<BuildingEntity> findAll(Map<String, String> params) {
 		String sql = "SELECT building.* FROM Building ";
 		String where = "WHERE 1=1";
 		String join = "";
 		String groupBy = " GROUP BY building.id ";
 		boolean statusGroupBy = false;
 
-		if (buildingCriteria.getName() != null && !buildingCriteria.getName().equals("")) {
-			where += " AND name LIKE '%" + buildingCriteria.getName() + "%'";
+		if (params.get("name") != null && !params.get("name").equals("")) {
+			where += " AND name LIKE '%" + params.get("name") + "%'";
 		}
-		if (buildingCriteria.getFloorArea() != null) {
-			where += " AND floorarea = " + buildingCriteria.getFloorArea();
+		if (params.get("floorArea") != null && !params.get("floorArea").equals("")) {
+			where += " AND floorarea = " + params.get("floorArea");
 		}
-		if (buildingCriteria.getDistrictId() != null) {
-			where += " AND districtid = " + buildingCriteria.getDistrictId();
+		if (params.get("districtId") != null && !params.get("districtId").equals("")) {
+			where += " AND districtid = " + params.get("districtId");
 		}
-		if (buildingCriteria.getWard() != null && !buildingCriteria.getWard().equals("")) {
-			where += " AND ward LIKE '%" + buildingCriteria.getWard() + "%'";
+		if (params.get("ward") != null && !params.get("ward").equals("")) {
+			where += " AND ward LIKE '%" + params.get("ward") + "%'";
 		}
-		if (buildingCriteria.getStreet() != null && !buildingCriteria.getStreet().equals("")) {
-			where += " AND street LIKE '%" + buildingCriteria.getStreet() + "%'";
+		if (params.get("street") != null && !params.get("street").equals("")) {
+			where += " AND street LIKE '%" + params.get("street") + "%'";
 		}
-		if (buildingCriteria.getNumberOfBasement() != null) {
-			where += " AND numberofbasement = " + buildingCriteria.getNumberOfBasement();
+		if (params.get("numberOfBasement") != null && !params.get("numberOfBasement").equals("")) {
+			where += " AND numberofbasement = " + params.get("numberOfBasement");
 		}
-		if (buildingCriteria.getDirection() != null && !buildingCriteria.getDirection().equals("")) {
-			where += " AND direction LIKE '%" + buildingCriteria.getDirection() + "%'";
+		if (params.get("direction") != null && !params.get("direction").equals("")) {
+			where += " AND direction LIKE '%" + params.get("direction") + "%'";
 		}
-		if (buildingCriteria.getLevel() != null && !buildingCriteria.getLevel().equals("")) {
-			where += " AND level LIKE '%" + buildingCriteria.getLevel() + "%'";
+		if (params.get("level") != null && !params.get("level").equals("")) {
+			where += " AND level LIKE '%" + params.get("level") + "%'";
 		}
-		if (buildingCriteria.getManagerName() != null && !buildingCriteria.getManagerName().equals("")) {
-			where += " AND managername LIKE '%" + buildingCriteria.getManagerName() + "%'";
+		if (params.get("managerName") != null && !params.get("managerName").equals("")) {
+			where += " AND managername LIKE '%" + params.get("managerName") + "%'";
 		}
-		if (buildingCriteria.getManagerPhoneNumber() != null && !buildingCriteria.getManagerPhoneNumber().equals("")) {
-			where += " AND managerphonenumber LIKE '%" + buildingCriteria.getManagerPhoneNumber() + "%'";
+		if (params.get("managerPhoneNumber") != null && !params.get("managerPhoneNumber").equals("")) {
+			where += " AND managerphonenumber LIKE '%" + params.get("managerPhoneNumber") + "%'";
 		}
-		if (buildingCriteria.getStaffId() != null) {
+		if (params.get("staffId") != null && !params.get("staffId").equals("")) {
 			join += " INNER JOIN assignmentbuilding ON building.id = assignmentbuilding.buildingid ";
-			where += " AND staffid = " + buildingCriteria.getStaffId();
+			where += " AND staffid = " + params.get("staffId");
 		}
-		if (buildingCriteria.getTypeCode() != null && buildingCriteria.getTypeCode().length != 0) {
+		if (params.get("typeCode") != null && !params.get("typeCode").equals("")) {
+			String[] typeCodes = params.get("typeCode").split(",");
 			join += " INNER JOIN buildingrenttype ON building.id = buildingrenttype.buildingid "
 					+ " INNER JOIN renttype ON buildingrenttype.renttypeid = renttype.id ";
 			where += " AND code IN (";
-			for (String item : buildingCriteria.getTypeCode()) {
+			for (String item : typeCodes) {
 				where += "'" + item + "',";
 			}
 			where = where.substring(0, where.length() - 1);
 			where += ") ";
 			statusGroupBy = true;
 		}
-		if (buildingCriteria.getRentPriceFrom() != null) {
-			where += " AND rentprice >= " + buildingCriteria.getRentPriceFrom();
+		if (params.get("rentPriceFrom") != null && !params.get("rentPriceFrom").equals("")) {
+			where += " AND rentprice >= " + params.get("rentPriceFrom");
 		}
-		if (buildingCriteria.getRentPriceTo() != null) {
-			where += " AND rentprice <= " + buildingCriteria.getRentPriceTo();
+		if (params.get("rentPriceTo") != null && !params.get("rentPriceTo").equals("")) {
+			where += " AND rentprice <= " + params.get("rentPriceTo");
 		}
-		if (!(buildingCriteria.getAreaFrom() == null && buildingCriteria.getAreaTo() == null)) {
+		if (!(params.get("areaFrom") == null && params.get("areaTo") == null)) {
 			join += " INNER JOIN rentarea ON building.id = rentarea.buildingid ";
 			statusGroupBy = true;
 		}
-		if (buildingCriteria.getAreaFrom() != null) {
-			where += " AND value >= " + buildingCriteria.getAreaFrom();
+		if (params.get("areaFrom") != null && !params.get("areaFrom").equals("")) {
+			where += " AND value >= " + params.get("areaFrom");
 		}
-		if (buildingCriteria.getAreaTo() != null) {
-			where += " AND value <= " + buildingCriteria.getAreaTo();
+		if (params.get("areaTo") != null && !params.get("areaTo").equals("")) {
+			where += " AND value <= " + params.get("areaTo");
 		}
 		sql += statusGroupBy ? join + where + groupBy : join + where;
 
-		List<BuildingDetailsDTO> result = new ArrayList<>();
+		List<BuildingEntity> result = new ArrayList<>();
 		try (Connection conn = ConnectionUtil.getConnection();
 				Statement stm = conn.createStatement();
 				ResultSet rs = stm.executeQuery(sql)) {
 			while (rs.next()) {
-				BuildingDetailsDTO building = new BuildingDetailsDTO();
+				BuildingEntity building = new BuildingEntity();
+				building.setId(rs.getLong("id"));
 				building.setName(rs.getString("name"));
 				building.setDistrictId(rs.getLong("districtid"));
 				building.setStreet(rs.getString("street"));
@@ -114,8 +107,6 @@ public class BuildingRepositoryImpl implements BuildingRepository {
 				building.setRentPrice(rs.getLong("rentprice"));
 				building.setBrokerageFee(rs.getDouble("brokeragefee"));
 				building.setServiceFee(rs.getString("servicefee"));
-				building.setDistrictName(districtRepository.getDistrictNameById(rs.getLong("id")));
-				building.setRentArea(rentAreaRepository.getRentAreaById(rs.getLong("id")));
 				result.add(building);
 			}
 		} catch (SQLException e) {
