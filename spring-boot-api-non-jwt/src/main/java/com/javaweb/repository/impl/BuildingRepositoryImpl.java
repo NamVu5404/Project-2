@@ -17,77 +17,95 @@ import com.javaweb.utils.ConnectionUtil;
 @Repository
 public class BuildingRepositoryImpl implements BuildingRepository {
 
-	@Override
-	public List<BuildingEntity> findAll(Map<String, String> params) {
-		String sql = "SELECT building.* FROM Building ";
-		String where = "WHERE 1=1";
-		String join = "";
-		String groupBy = " GROUP BY building.id ";
-		boolean statusGroupBy = false;
+	public String whereQuery(Map<String, String> params) {
+		StringBuilder where = new StringBuilder("WHERE 1=1");
 
 		if (params.get("name") != null && !params.get("name").equals("")) {
-			where += " AND name LIKE '%" + params.get("name") + "%'";
+			where.append(" AND name LIKE '%").append(params.get("name")).append("%'");
 		}
 		if (params.get("floorArea") != null && !params.get("floorArea").equals("")) {
-			where += " AND floorarea = " + params.get("floorArea");
+			where.append(" AND floorarea = ").append(params.get("floorArea"));
 		}
 		if (params.get("districtId") != null && !params.get("districtId").equals("")) {
-			where += " AND districtid = " + params.get("districtId");
+			where.append(" AND districtid = ").append(params.get("districtId"));
 		}
 		if (params.get("ward") != null && !params.get("ward").equals("")) {
-			where += " AND ward LIKE '%" + params.get("ward") + "%'";
+			where.append(" AND ward LIKE '%").append(params.get("ward")).append("%'");
 		}
 		if (params.get("street") != null && !params.get("street").equals("")) {
-			where += " AND street LIKE '%" + params.get("street") + "%'";
+			where.append(" AND street LIKE '%").append(params.get("street")).append("%'");
 		}
 		if (params.get("numberOfBasement") != null && !params.get("numberOfBasement").equals("")) {
-			where += " AND numberofbasement = " + params.get("numberOfBasement");
+			where.append(" AND numberofbasement = ").append(params.get("numberOfBasement"));
 		}
 		if (params.get("direction") != null && !params.get("direction").equals("")) {
-			where += " AND direction LIKE '%" + params.get("direction") + "%'";
+			where.append(" AND direction LIKE '%").append(params.get("direction")).append("%'");
 		}
 		if (params.get("level") != null && !params.get("level").equals("")) {
-			where += " AND level LIKE '%" + params.get("level") + "%'";
+			where.append(" AND level LIKE '%").append(params.get("level")).append("%'");
 		}
 		if (params.get("managerName") != null && !params.get("managerName").equals("")) {
-			where += " AND managername LIKE '%" + params.get("managerName") + "%'";
+			where.append(" AND managername LIKE '%").append(params.get("managerName")).append("%'");
 		}
 		if (params.get("managerPhoneNumber") != null && !params.get("managerPhoneNumber").equals("")) {
-			where += " AND managerphonenumber LIKE '%" + params.get("managerPhoneNumber") + "%'";
+			where.append(" AND managerphonenumber LIKE '%").append(params.get("managerPhoneNumber")).append("%'");
+		}
+		if (params.get("rentPriceFrom") != null && !params.get("rentPriceFrom").equals("")) {
+			where.append(" AND rentprice >= ").append(params.get("rentPriceFrom"));
+		}
+		if (params.get("rentPriceTo") != null && !params.get("rentPriceTo").equals("")) {
+			where.append(" AND rentprice <= ").append(params.get("rentPriceTo"));
+		}
+		if (params.get("areaFrom") != null && !params.get("areaFrom").equals("")) {
+			where.append(" AND value >= ").append(params.get("areaFrom"));
+		}
+		if (params.get("areaTo") != null && !params.get("areaTo").equals("")) {
+			where.append(" AND value <= ").append(params.get("areaTo"));
 		}
 		if (params.get("staffId") != null && !params.get("staffId").equals("")) {
-			join += " INNER JOIN assignmentbuilding ON building.id = assignmentbuilding.buildingid ";
-			where += " AND staffid = " + params.get("staffId");
+			where.append(" AND staffid = ").append(params.get("staffId"));
 		}
 		if (params.get("typeCode") != null && !params.get("typeCode").equals("")) {
 			String[] typeCodes = params.get("typeCode").split(",");
-			join += " INNER JOIN buildingrenttype ON building.id = buildingrenttype.buildingid "
-					+ " INNER JOIN renttype ON buildingrenttype.renttypeid = renttype.id ";
-			where += " AND code IN (";
+			where.append(" AND code IN (");
 			for (String item : typeCodes) {
-				where += "'" + item + "',";
+				where.append("'").append(item).append("',");
 			}
-			where = where.substring(0, where.length() - 1);
-			where += ") ";
-			statusGroupBy = true;
+			where.setLength(where.length() - 1);
+			where.append(") ");
 		}
-		if (params.get("rentPriceFrom") != null && !params.get("rentPriceFrom").equals("")) {
-			where += " AND rentprice >= " + params.get("rentPriceFrom");
+
+		return where.toString();
+	}
+
+	public String joinQuery(Map<String, String> params) {
+		StringBuilder join = new StringBuilder();
+
+		if (params.get("staffId") != null && !params.get("staffId").equals("")) {
+			join.append(" INNER JOIN assignmentbuilding ON building.id = assignmentbuilding.buildingid ");
 		}
-		if (params.get("rentPriceTo") != null && !params.get("rentPriceTo").equals("")) {
-			where += " AND rentprice <= " + params.get("rentPriceTo");
+		if (params.get("typeCode") != null && !params.get("typeCode").equals("")) {
+			join.append(" INNER JOIN buildingrenttype ON building.id = buildingrenttype.buildingid ")
+					.append(" INNER JOIN renttype ON buildingrenttype.renttypeid = renttype.id ");
 		}
 		if (!(params.get("areaFrom") == null && params.get("areaTo") == null)) {
-			join += " INNER JOIN rentarea ON building.id = rentarea.buildingid ";
-			statusGroupBy = true;
+			join.append(" INNER JOIN rentarea ON building.id = rentarea.buildingid ");
 		}
-		if (params.get("areaFrom") != null && !params.get("areaFrom").equals("")) {
-			where += " AND value >= " + params.get("areaFrom");
+
+		return join.toString();
+	}
+
+	@Override
+	public List<BuildingEntity> findAll(Map<String, String> params) {
+		String sql = "SELECT building.* FROM Building ";
+		String where = whereQuery(params);
+		String join = joinQuery(params);
+		String groupBy = " GROUP BY building.id ";
+		if (params.get("typeCode") != null || !(params.get("areaFrom") == null && params.get("areaTo") == null)) {
+			sql += join + where + groupBy;
+		} else {
+			sql += join + where;
 		}
-		if (params.get("areaTo") != null && !params.get("areaTo").equals("")) {
-			where += " AND value <= " + params.get("areaTo");
-		}
-		sql += statusGroupBy ? join + where + groupBy : join + where;
 
 		List<BuildingEntity> result = new ArrayList<>();
 		try (Connection conn = ConnectionUtil.getConnection();

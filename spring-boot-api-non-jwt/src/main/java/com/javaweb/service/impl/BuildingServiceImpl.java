@@ -3,6 +3,7 @@ package com.javaweb.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,11 +45,7 @@ public class BuildingServiceImpl implements BuildingService {
 			building.setRentPrice(item.getRentPrice());
 			building.setBrokerageFee(item.getBrokerageFee());
 			building.setServiceFee(item.getServiceFee());
-			String rentArea = "";
-			for (Long value : rentAreas) {
-				rentArea += String.valueOf(value) + ", ";
-			}
-			rentArea = rentArea.substring(0, rentArea.length() - 2);
+			String rentArea = String.join(", ", rentAreas.stream().map(Object::toString).collect(Collectors.toList()));
 			building.setRentArea(rentArea);
 			result.add(building);
 		}
