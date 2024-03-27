@@ -1,5 +1,7 @@
 package com.javaweb.repository;
 
+import com.javaweb.repository.entity.DistrictEntity;
+
 public interface DistrictRepository {
-	String getDistrictNameByBuildingId(Long buildingId);
+	DistrictEntity findById(Long id);
 }

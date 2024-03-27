@@ -10,30 +10,31 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 
 import com.javaweb.repository.RentAreaRepository;
+import com.javaweb.repository.entity.RentAreaEntity;
 import com.javaweb.utils.ConnectionUtil;
 
 @Repository
 public class RentAreaRepositoryImpl implements RentAreaRepository {
 
 	@Override
-	public List<Long> getRentAreaByBuildingId(Long buildingId) {
-		String sql = "SELECT rentarea.value FROM rentarea "
-				+ "INNER JOIN building ON building.id = rentarea.buildingid "
-				+ "WHERE buildingid = " + buildingId;
+	public List<String> findByBuildingId(Long buildingId) {
 		
-		List<Long> result = new ArrayList<>();
+		String sql = "SELECT * FROM rentarea WHERE buildingid = " + buildingId;
+		List<String> rentAreas = new ArrayList<>();
 		try (Connection conn = ConnectionUtil.getConnection();
 				Statement stm = conn.createStatement();
 				ResultSet rs = stm.executeQuery(sql)) {
 			while (rs.next()) {
-				result.add(rs.getLong("value"));
+				RentAreaEntity rentAreaEntity = new RentAreaEntity();
+				rentAreaEntity.setValue(rs.getLong("value"));
+				rentAreas.add(rentAreaEntity.getValue().toString());
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			System.out.println("Connection failed");
 		}
 		
-		return result;
+		return rentAreas;
 	}
 
 }
