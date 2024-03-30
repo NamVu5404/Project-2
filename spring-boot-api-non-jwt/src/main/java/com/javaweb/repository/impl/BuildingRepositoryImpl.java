@@ -7,6 +7,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 
@@ -72,15 +73,22 @@ public class BuildingRepositoryImpl implements BuildingRepository {
 		if (StringUtil.checkString(rentPriceTo)) {
 			where.append(" AND b.rentprice <= " + rentPriceTo);
 		}
+		//Java 7		
+//		if (typeCode != null && !typeCode.isEmpty()) {
+//			where.append(" AND rt.code IN (");
+//			for (int i = 0; i < typeCode.size(); i++) {
+//				where.append("'" + typeCode.get(i) + "'");
+//				if (i < typeCode.size() - 1) {
+//					where.append(", ");
+//				}
+//			}
+//			where.append(") ");
+//		}
+		// Java 8
 		if (typeCode != null && !typeCode.isEmpty()) {
-			where.append(" AND rt.code IN (");
-			for (int i = 0; i < typeCode.size(); i++) {
-				where.append("'" + typeCode.get(i) + "'");
-				if (i < typeCode.size() - 1) {
-					where.append(", ");
-				}
-			}
-			where.append(") ");
+			where.append(" AND (");
+			where.append(typeCode.stream().map(item -> " rt.code LIKE '%" + item + "%' ").collect(Collectors.joining(" OR ")));
+			where.append(" ) ");
 		}
 	}
  
