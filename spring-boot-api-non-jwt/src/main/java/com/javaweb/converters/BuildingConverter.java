@@ -1,35 +1,25 @@
 package com.javaweb.converters;
 
-import java.util.List;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.javaweb.DTO.BuildingDTO;
-import com.javaweb.repository.DistrictRepository;
-import com.javaweb.repository.RentAreaRepository;
+import com.javaweb.DTO.response.BuildingResponseDTO;
 import com.javaweb.repository.entity.BuildingEntity;
-import com.javaweb.repository.entity.DistrictEntity;
 
 @Component
 public class BuildingConverter {
-	
-	@Autowired
-	private DistrictRepository districtRepository;
-	
-	@Autowired
-	private RentAreaRepository rentAreaRepository;
-	
+
 	@Autowired
 	private ModelMapper modelMapper;
 	
-	public BuildingDTO toBuildingDTO(BuildingEntity item) {
-		BuildingDTO building = modelMapper.map(item, BuildingDTO.class);
-		DistrictEntity districtEntity = districtRepository.findById(item.getDistrictId());
-		List<String> rentAreas = rentAreaRepository.findByBuildingId(item.getId());
-		building.setAdress(item.getStreet() + ", " + item.getWard() + ", " + districtEntity.getName());
-		building.setRentArea(String.join(", ", rentAreas));
+	public BuildingResponseDTO toBuildingResponseDTO(BuildingEntity item) {
+		BuildingResponseDTO building = modelMapper.map(item, BuildingResponseDTO.class);
+		building.setAddress(item.getStreet() + ", " + item.getWard() + ", " + item.getDistrict().getName());
+		String rentAreas = item.getRentAreas().stream().map(it -> it.getValue().toString()).collect(Collectors.joining(","));
+		building.setRentArea(rentAreas);
 		
 		return building;
 	}

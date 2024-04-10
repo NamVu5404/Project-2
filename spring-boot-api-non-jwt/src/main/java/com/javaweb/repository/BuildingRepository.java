@@ -7,6 +7,7 @@ import com.javaweb.repository.entity.BuildingEntity;
 
 public interface BuildingRepository {
 	List<BuildingEntity> findAll(BuildingSearchBuilder builder);
-	void delete(Long[] ids);
-	void create();
+	void createBuilding(BuildingEntity buildingEntity);
+	void updateBuilding(BuildingEntity buildingEntity);
+	void deleteBuilding(BuildingEntity buildingEntity);
 }

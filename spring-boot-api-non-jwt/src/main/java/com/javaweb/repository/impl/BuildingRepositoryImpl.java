@@ -1,24 +1,26 @@
 package com.javaweb.repository.impl;
 
 import java.lang.reflect.Field;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Repository;
 
 import com.javaweb.builder.BuildingSearchBuilder;
 import com.javaweb.repository.BuildingRepository;
 import com.javaweb.repository.entity.BuildingEntity;
-import com.javaweb.utils.ConnectionUtil;
 import com.javaweb.utils.StringUtil;
 
 @Repository
 public class BuildingRepositoryImpl implements BuildingRepository {
+
+	@PersistenceContext
+	private EntityManager entityManager;
 
 	public void queryJoin(BuildingSearchBuilder builder, StringBuilder sql) {
 		Long areaFrom = builder.getAreaFrom();
@@ -104,6 +106,7 @@ public class BuildingRepositoryImpl implements BuildingRepository {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<BuildingEntity> findAll(BuildingSearchBuilder builder) {
 		StringBuilder sql = new StringBuilder("SELECT b.id, b.name, b.districtid, b.street, "
@@ -117,44 +120,26 @@ public class BuildingRepositoryImpl implements BuildingRepository {
 		sql.append(where);
 		sql.append(" GROUP BY b.id");
 
-		List<BuildingEntity> result = new ArrayList<>();
-		try (Connection conn = ConnectionUtil.getConnection();
-				Statement stm = conn.createStatement();
-				ResultSet rs = stm.executeQuery(sql.toString())) {
-			while (rs.next()) {
-				BuildingEntity building = new BuildingEntity();
-				building.setId(rs.getLong("id"));
-				building.setName(rs.getString("name"));
-				building.setDistrictId(rs.getLong("districtid"));
-				building.setStreet(rs.getString("street"));
-				building.setWard(rs.getString("ward"));
-				building.setNumberOfBasement(rs.getLong("numberofbasement"));
-				building.setManagerName(rs.getString("managername"));
-				building.setManagerPhoneNumber(rs.getString("managerphonenumber"));
-				building.setFloorArea(rs.getLong("floorarea"));
-				building.setRentPrice(rs.getLong("rentprice"));
-				building.setBrokerageFee(rs.getDouble("brokeragefee"));
-				building.setServiceFee(rs.getString("servicefee"));
-				result.add(building);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-			System.out.println("Connection failed");
-		}
-
-		return result;
+		Query query = entityManager.createNativeQuery(sql.toString(), BuildingEntity.class);
+		return query.getResultList();
 	}
 
+	@Transactional
 	@Override
-	public void delete(Long[] ids) {
-		// TODO Auto-generated method stub
-
+	public void createBuilding(BuildingEntity buildingEntity) {
+		entityManager.persist(buildingEntity);
 	}
 
+	@Transactional
 	@Override
-	public void create() {
-		// TODO Auto-generated method stub
+	public void updateBuilding(BuildingEntity buildingEntity) {
+		entityManager.merge(buildingEntity);
+	}
 
+	@Transactional
+	@Override
+	public void deleteBuilding(BuildingEntity buildingEntity) {
+		entityManager.remove(buildingEntity);
 	}
 
 }

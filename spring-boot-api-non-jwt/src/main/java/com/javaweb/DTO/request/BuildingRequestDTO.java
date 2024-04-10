@@ -1,17 +1,27 @@
-package com.javaweb.DTO;
+package com.javaweb.DTO.request;
 
-public class BuildingDTO {
+public class BuildingRequestDTO {
+
+	private Long id;
 	private String name;
-	private String adress;
+	private String ward;
+	private String street;
+	private Long districtId;
 	private Long numberOfBasement;
 	private String managerName;
 	private String managerPhoneNumber;
 	private Long floorArea;
-	private Long emptyArea;
-	private String rentArea;
 	private Long rentPrice;
 	private Double brokerageFee;
 	private String serviceFee;
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
 
 	public String getName() {
 		return name;
@@ -21,12 +31,28 @@ public class BuildingDTO {
 		this.name = name;
 	}
 
-	public String getAdress() {
-		return adress;
+	public String getWard() {
+		return ward;
 	}
 
-	public void setAdress(String adress) {
-		this.adress = adress;
+	public void setWard(String ward) {
+		this.ward = ward;
+	}
+
+	public String getStreet() {
+		return street;
+	}
+
+	public void setStreet(String street) {
+		this.street = street;
+	}
+
+	public Long getDistrictId() {
+		return districtId;
+	}
+
+	public void setDistrictId(Long districtId) {
+		this.districtId = districtId;
 	}
 
 	public Long getNumberOfBasement() {
@@ -59,22 +85,6 @@ public class BuildingDTO {
 
 	public void setFloorArea(Long floorArea) {
 		this.floorArea = floorArea;
-	}
-
-	public Long getEmptyArea() {
-		return emptyArea;
-	}
-
-	public void setEmptyArea(Long emptyArea) {
-		this.emptyArea = emptyArea;
-	}
-
-	public String getRentArea() {
-		return rentArea;
-	}
-
-	public void setRentArea(String rentArea) {
-		this.rentArea = rentArea;
 	}
 
 	public Long getRentPrice() {
