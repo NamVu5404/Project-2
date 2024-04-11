@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,15 +30,18 @@ public class BuildingServiceImpl implements BuildingService {
 
 	@Autowired
 	private BuildingSearchBuilderConverter buildingSearchBuilderConverter;
-	
-	@PersistenceContext
-	private EntityManager entityManager;
+
+	@Autowired
+	private ModelMapper modelMapper;
 
 	@Override
 	public List<BuildingResponseDTO> findAll(Map<String, Object> params, List<String> typeCode) {
 		BuildingSearchBuilder buildingSearchBuilder = buildingSearchBuilderConverter.toBuildingSearchBuilder(params,
 				typeCode);
 		List<BuildingEntity> buildingEntities = buildingRepository.findAll(buildingSearchBuilder);
+//		List<BuildingEntity> buildingEntities = buildingRepository
+//				.findByNameContainingAndWardContaining(buildingSearchBuilder.getName(), "Phuong 6");
+//		BuildingEntity buildingEntity= buildingRepository.findById(1L).get();
 		List<BuildingResponseDTO> result = new ArrayList<BuildingResponseDTO>();
 
 		for (BuildingEntity item : buildingEntities) {
@@ -50,25 +52,16 @@ public class BuildingServiceImpl implements BuildingService {
 		return result;
 	}
 
-	@Autowired
-	private ModelMapper modelMapper;
-
 	@Override
-	public void createBuilding(BuildingRequestDTO buildingRequestDTO) {
+	public void create(BuildingRequestDTO buildingRequestDTO) {
 		BuildingEntity buildingEntity = modelMapper.map(buildingRequestDTO, BuildingEntity.class);
-		buildingRepository.createBuilding(buildingEntity);
+		buildingRepository.save(buildingEntity);
 	}
 
+	@Transactional
 	@Override
-	public void updateBuilding(BuildingRequestDTO buildingRequestDTO) {
-		BuildingEntity buildingEntity = modelMapper.map(buildingRequestDTO, BuildingEntity.class);
-		buildingRepository.updateBuilding(buildingEntity);
-	}
-
-	@Override
-	public void deleteBuilding(Long id) {
-		BuildingEntity buildingEntity = entityManager.find(BuildingEntity.class, id);
-		buildingRepository.deleteBuilding(buildingEntity);
+	public void delete(Long[] ids) {
+		buildingRepository.deleteByIdIn(ids);
 	}
 
 }

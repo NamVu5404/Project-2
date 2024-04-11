@@ -1,4 +1,4 @@
-package com.javaweb.repository.impl;
+package com.javaweb.repository.custom.impl;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -7,17 +7,16 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Repository;
 
 import com.javaweb.builder.BuildingSearchBuilder;
-import com.javaweb.repository.BuildingRepository;
+import com.javaweb.repository.custom.BuildingRepositoryCustom;
 import com.javaweb.repository.entity.BuildingEntity;
 import com.javaweb.utils.StringUtil;
 
 @Repository
-public class BuildingRepositoryImpl implements BuildingRepository {
+public class BuildingRepositoryImpl implements BuildingRepositoryCustom {
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -122,24 +121,6 @@ public class BuildingRepositoryImpl implements BuildingRepository {
 
 		Query query = entityManager.createNativeQuery(sql.toString(), BuildingEntity.class);
 		return query.getResultList();
-	}
-
-	@Transactional
-	@Override
-	public void createBuilding(BuildingEntity buildingEntity) {
-		entityManager.persist(buildingEntity);
-	}
-
-	@Transactional
-	@Override
-	public void updateBuilding(BuildingEntity buildingEntity) {
-		entityManager.merge(buildingEntity);
-	}
-
-	@Transactional
-	@Override
-	public void deleteBuilding(BuildingEntity buildingEntity) {
-		entityManager.remove(buildingEntity);
 	}
 
 }
