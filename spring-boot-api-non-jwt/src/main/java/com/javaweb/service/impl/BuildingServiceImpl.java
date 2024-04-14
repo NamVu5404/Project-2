@@ -37,7 +37,7 @@ public class BuildingServiceImpl implements BuildingService {
 			List<Long> rentAreas = rentAreaRepository.getRentAreaByBuildingId(item.getId());
 			BuildingDTO building = new BuildingDTO();
 			building.setName(item.getName());
-			building.setAdress(item.getStreet() + ", " + item.getWard() + ", " + districtName);
+			building.setAddress(item.getStreet() + ", " + item.getWard() + ", " + districtName);
 			building.setNumberOfBasement(item.getNumberOfBasement());
 			building.setManagerName(item.getManagerName());
 			building.setManagerPhoneNumber(item.getManagerPhoneNumber());
